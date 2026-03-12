@@ -6,7 +6,7 @@
 
 -- setup
 local augroup = vim.api.nvim_create_augroup("minipoon", {})
-local data_dir = vim.fs.joinpath(vim.fn.stdpath("data"), "minipoon")
+local data_dir = vim.fs.joinpath(vim.fn.stdpath("state"), "minipoon")
 local data_file = vim.fs.joinpath(data_dir, "marks.json")
 
 if vim.fn.isdirectory(data_dir) == 0 then
