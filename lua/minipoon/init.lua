@@ -57,12 +57,6 @@ local function get_current_file(root)
 end
 
 -- functionality
-local menu_id = math.random(100000)
-local function get_menu_name()
-	menu_id = menu_id + 1
-	return "__minipoon__" .. menu_id
-end
-
 local window = {
 	buf = -1,
 	win = -1,
@@ -246,10 +240,6 @@ function Marks:toggle_window()
 	vim.bo[buf].buflisted = false
 	vim.bo[buf].filetype = "minipoon"
 	vim.bo[buf].buftype = "acwrite" -- custom :write behavior
-
-	if vim.api.nvim_buf_get_name(buf) == "" then
-		vim.api.nvim_buf_set_name(buf, get_menu_name())
-	end
 
 	vim.api.nvim_create_autocmd("BufWriteCmd", {
 		group = augroup,
