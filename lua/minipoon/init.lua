@@ -281,8 +281,26 @@ function Marks:toggle_window()
 		self:close_window()
 	end, { buffer = buf })
 
-	local width = math.floor(vim.o.columns * 0.3)
-	local height = math.max(math.floor(vim.o.lines * 0.15), 5) -- at least 5 lines
+	local contents = self:_get_mark_names()
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, contents)
+
+	local sizes = {
+		min_width = math.floor(vim.o.columns * 0.3),
+		min_height = math.max(math.floor(vim.o.lines * 0.15), 5), -- at least 5 lines
+		max_width = math.floor(vim.o.columns * 0.8),
+		max_height = math.floor(vim.o.lines * 0.8),
+	}
+
+	local longest = sizes.min_width;
+	for _, line in pairs(contents) do
+		local length = vim.api.nvim_strwidth(line)
+		if length > longest then
+			longest = length
+		end
+	end
+	-- You need to add 2 to account for border, 1 for the numbers, 1 for the space between the numbers and text, and 2 to the padding at the end
+	local width = math.min(longest, sizes.max_width) + 6
+	local height = math.min(math.max(sizes.min_height, #contents), sizes.max_height)
 	---@type vim.api.keyset.win_config
 	local default_opts = {
 		relative = "editor",
@@ -295,12 +313,10 @@ function Marks:toggle_window()
 		border = "rounded",
 	}
 
-	local contents = self:_get_mark_names()
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, contents)
-
 	local win_config = vim.tbl_deep_extend("force", self.win_config, default_opts)
 	local win = vim.api.nvim_open_win(buf, true, win_config)
 
+	vim.wo[win].signcolumn = "no"
 	vim.wo[win].number = true
 	vim.wo[win].relativenumber = false
 
